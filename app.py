@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import os
 from dotenv import load_dotenv
 import sqlite3
+from contextlib import closing
 
 load_dotenv()
 
@@ -10,9 +11,10 @@ app = Flask(__name__)
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE_URL)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """Context manager for database connections."""
+    with sqlite3.connect(DATABASE_URL) as conn:
+        conn.row_factory = sqlite3.Row
+        yield conn
 
 @app.route('/analyze', methods=['POST'])
 def analyze_hand():
@@ -36,12 +38,10 @@ def store_hand():
     analysis = data.get('analysis')
     advice = data.get('advice')
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("INSERT INTO poker_hands (hand, analysis, advice) VALUES (?, ?, ?)", (hand, analysis, advice))
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:  # Using context manager
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO poker_hands (hand, analysis, advice) VALUES (?, ?, ?)", (hand, analysis, advice))
+        # Commit is not needed here as context manager will take care of it
     
     return jsonify({'message': 'Hand data stored successfully'})
 
