@@ -2,6 +2,7 @@ import itertools
 import random
 from collections import Counter
 from enum import Enum
+from functools import lru_cache  # Import lru_cache
 
 class HandRank(Enum):
     HIGH_CARD = 1
@@ -20,8 +21,9 @@ def create_deck():
     values = '23456789TJQKA'
     return [value + suit for value in values for suit in suits]
 
+@lru_cache(maxsize=None)  # Apply lru_cache decorator
 def evaluate_hand(hand):
-    hand = sorted(hand, key=lambda x: "23456789TJQKA".index(x[0]))  
+    hand = tuple(sorted(hand, key=lambda x: "23456789TJQKA".index(x[0])))  # Ensure the input is a tuple and sorted
     
     is_flush = len(set(card[1] for card in hand)) == 1
     is_straight = all("23456789TJQKA".index(hand[i][0]) - "23456789TJQKA".index(hand[i-1][0]) == 1 for i in range(1, 5))
@@ -39,7 +41,7 @@ def evaluate_hand(hand):
     elif highest_freq == 3 and most_common[1][1] == 2:
         return HandRank.FULL_HOUSE
     elif is_flush:
-        return HandRank.FLUSH
+        return HandRectangle.FLUSH
     elif is_straight:
         return HandRank.STRAIGHT
     elif highest_freq == 3:
@@ -51,10 +53,13 @@ def evaluate_hand(hand):
     else:
         return HandRank.HIGH_CARD
 
+@lru_cache(maxsize=None)  # It's necessary to apply lru_cache to another function if intending to cache something else like hand_odds
 def hand_odds(hand, deck):
+    hand = tuple(sorted(hand))  # Ensure input hand is a tuple for caching purposes
+    deck = tuple(sorted(deck))  # Ensure input deck is a tuple for caching purposes
     hand_ranks = {rank: 0 for rank in HandRank}
     for cards in itertools.combinations(deck, 5 - len(hand)):
-        test_hand = list(hand) + list(cards)
+        test_hand = hand + cards  # Use tuples for immutability and caching
         rank = evaluate_hand(test_hand)
         hand_ranks[rank] += 1
     
@@ -63,7 +68,10 @@ def hand_odds(hand, deck):
     return odds
 
 def strategy_advice(hand, deck):
-    odds = hand_odds(hand, deck)
+    # Convert hand and deck to tuples for caching the results in hand_odds
+    hand_tuple = tuple(sorted(hand))
+    deck_tuple = tuple(sorted(deck))
+    odds = hand_odds(hand_tuple, deck_tuple)
     sorted_odds = sorted(odds.items(), key=lambda x: x[1], reverse=True)
 
     advice = f"With your hand, your best chances are to aim for a {sorted_odds[0][0].name.replace('_', ' ').title()}, "
