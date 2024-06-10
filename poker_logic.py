@@ -2,7 +2,7 @@ import itertools
 import random
 from collections import Counter
 from enum import Enum
-from functools import lru_cache  # Import lru_cache
+from functools import lru_cache
 
 class HandRank(Enum):
     HIGH_CARD = 1
@@ -17,16 +17,17 @@ class HandRank(Enum):
     ROYAL_FLUSH = 10
 
 def create_deck():
-    suits = 'HDSC'  
+    suits = 'HDSC'  # Suits are reused, no need to be object
     values = '23456789TJQKA'
     return [value + suit for value in values for suit in suits]
 
-@lru_cache(maxsize=None)  # Apply lru_cache decorator
+@lru_cache(maxsize=None)
 def evaluate_hand(hand):
-    hand = tuple(sorted(hand, key=lambda x: "23456789TJQKA".index(x[0])))  # Ensure the input is a tuple and sorted
+    CARD_ORDER = "23456789TJQKA"
+    hand = tuple(sorted(hand, key=lambda x: CARD_ORDER.index(x[0])))
     
     is_flush = len(set(card[1] for card in hand)) == 1
-    is_straight = all("23456789TJQKA".index(hand[i][0]) - "23456789TJQKA".index(hand[i-1][0]) == 1 for i in range(1, 5))
+    is_straight = all(CARD_ORDER.index(hand[i][0]) - CARD_ORDER.index(hand[i-1][0]) == 1 for i in range(1, 5))
     
     ranks = Counter([card[0] for card in hand])
     most_common = ranks.most_common()
@@ -41,7 +42,7 @@ def evaluate_hand(hand):
     elif highest_freq == 3 and most_common[1][1] == 2:
         return HandRank.FULL_HOUSE
     elif is_flush:
-        return HandRectangle.FLUSH
+        return HandRank.FLUSH
     elif is_straight:
         return HandRank.STRAIGHT
     elif highest_freq == 3:
@@ -53,13 +54,13 @@ def evaluate_hand(hand):
     else:
         return HandRank.HIGH_CARD
 
-@lru_cache(maxsize=None)  # It's necessary to apply lru_cache to another function if intending to cache something else like hand_odds
+@lru_cache(maxsize=None)
 def hand_odds(hand, deck):
-    hand = tuple(sorted(hand))  # Ensure input hand is a tuple for caching purposes
-    deck = tuple(sorted(deck))  # Ensure input deck is a tuple for caching purposes
+    hand = tuple(sorted(hand))
+    deck = tuple(sorted(deck))
     hand_ranks = {rank: 0 for rank in HandRank}
     for cards in itertools.combinations(deck, 5 - len(hand)):
-        test_hand = hand + cards  # Use tuples for immutability and caching
+        test_hand = hand + cards
         rank = evaluate_hand(test_hand)
         hand_ranks[rank] += 1
     
@@ -68,7 +69,6 @@ def hand_odds(hand, deck):
     return odds
 
 def strategy_advice(hand, deck):
-    # Convert hand and deck to tuples for caching the results in hand_odds
     hand_tuple = tuple(sorted(hand))
     deck_tuple = tuple(sorted(deck))
     odds = hand_odds(hand_tuple, deck_tuple)
