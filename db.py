@@ -4,57 +4,60 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_PATH = os.getenv("DATABASE_PATH", "poker_assistant.db")
+DB_PATH = os.getenv("DATABASE_PATH", "poker_assistant.db")
 
-CREATE_HANDS_TABLE = """CREATE TABLE IF NOT EXISTS hands (
+SQL_CREATE_HANDS_TABLE = """CREATE TABLE IF NOT EXISTS hands (
                             id INTEGER PRIMARY KEY,
                             hand TEXT NOT NULL,
-                            result TEXT NOT NULL
+                            outcome TEXT NOT NULL
                         );"""
 
-def connect_db():
+def db_connect():
     try:
-        conn = sqlite3.connect(DATABASE_PATH)
+        connection = sqlite3.connect(DB_PATH)
         print("Connection to the database is successful.")
-        return conn
-    except sqlite3.Error as e:
-        print(f"Error connecting to database: {e}")
+        return connection
+    except sqlite3.Error as error:
+        print(f"Error connecting to database: {error}")
         return None
 
-def create_table(conn):
+def create_hands_table(connection):
     try:
-        cursor = conn.cursor()
-        cursor.execute(CREATE_HANDS_TABLE)
-        print("Table created successfully.")
-    except sqlite3.Error as e:
-        print(f"Error creating table: {e}")
+        cursor = connection.cursor()
+        cursor.execute(SQL_CREATE_HANDS_TABLE)
+        print("Hands table created successfully.")
+    except sqlite3.Error as error:
+        print(f"Error creating hands table: {error}")
 
-def insert_hand(conn, hand, result):
+def insert_hand_record(connection, poker_hand, outcome):
     try:
-        sql = '''INSERT INTO hands(hand, result) VALUES(?,?)'''
-        cur = conn.cursor()
-        cur.execute(sql, (hand, result))
-        conn.commit()
-        print("Hand data inserted successfully.")
-    except sqlite3.Error as e:
-        print(f"Error inserting hand data: {e}")
+        insert_query = '''INSERT INTO hands(hand, outcome) VALUES(?,?)'''
+        cursor = connection.cursor()
+        cursor.execute(insert_query, (poker_hand, outcome))
+        connection.commit()
+        print("Poker hand data inserted successfully.")
+    except sqlite3.Error as error:
+        print(f"Error inserting poker hand data: {error}")
 
-def fetch_hands(conn):
+def retrieve_hand_records(connection):
     try:
-        sql = '''SELECT * FROM hands'''
-        cur = conn.cursor()
-        cur.execute(sql)
+        select_query = '''SELECT * FROM hands'''
+        cursor = connection.cursor()
+        cursor.execute(select_query)
         
-        rows = cur.fetchall()
+        rows = cursor.fetchall()
         
         for row in rows:
             print(row)
-    except sqlite3.Error as e:
-        print(f"Error fetching hands data: {e}")
+    except sqlite3.Error as error:
+        print(f"Error fetching poker hands data: {error}")
 
 if __name__ == "__main__":
-    conn = connect_implugin_hand(conn, "5H 5C 6S 7S KD", "Pair of Fives")
-    fetch_hands(conn)
+    connection = db_connect()
     
-    if conn:
-        conn.close()
+    if connection:  # Ensure connection was successful before proceeding
+        create_hands_table(connection)
+        insert_hand_record(connection, "5H 5C 6S 7S KD", "Pair of Fives")
+        retrieve_hand_records(connection)
+
+        connection.close()
