@@ -5,39 +5,38 @@ import './PokerAssistant.css';
 const PokerAssistantApp = () => {
   const [hand, setHand] = useState('');
   const [analysis, setAnalysis] = useState('');
+  const [analysisHistory, setAnalysisHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const analyzeHand = async () => {
-    if (!hand) {
-      alert('Please enter your poker hand to analyze.');
-      return;
-    }
 
-    try {
-      setIsLoading(true);
-      const response = await axios.post(process.env.REACT_APP_BACKEND_URL + '/analyze-hand', { hand });
-      setAnalysis(response.data.analysis);
-    } catch (error) {
-      console.error('Error fetching analysis:', error);
-      setAnalysis('Failed to fetch analysis.');
-    } finally {
-      setIsLoading(false);
-    }
+  const analyzeHand = async () => {
+    setIsLoading(true);
+    const result = await axios.get(`https://api.pokerhands.com/analyze?hand=${hand}`);
+    setAnalysis(result.data);
+    setAnalysisHistory(oldHistory => [...oldHistory, result.data]);
+    setIsLoading(false);
   };
 
   return (
-    <div className="pokerAssistantApp">
-      <h1>Poker Assistant</h1>
+    <div className="PokerAssistant">
       <input
-        type="text"
-        placeholder="Enter your poker hand"
         value={hand}
         onChange={(e) => setHand(e.target.value)}
+        placeholder="Enter hand"
       />
-      <button onClick={analyzeSmoothie} disabled={isLoading}>
-        {isLoading ? 'Analyzing...' : 'Analyze Hand'}
+      <button onClick={analyzeHand} disabled={isLoading}>
+        Analyze Hand
       </button>
-      {analysis && <div className="analysisResult">{analysis}</div>}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <div>{analysis}</div>
+      )}
+      <div>
+        <h2>Analysis History</h2>
+        {analysisHistory.map((analysis, index) => (
+          <div key={index}>{analysis}</div>
+        ))}
+      </div>
     </div>
   );
 };
