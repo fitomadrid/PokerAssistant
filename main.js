@@ -3,38 +3,44 @@ import { useState } from 'react';
 import './PokerAssistant.css';
 
 const PokerAssistantApp = () => {
-  const [hand, setHand] = useState('');
-  const [analysis, setAnalysis] = useState('');
-  const [analysisHistory, setAnalysisHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentHand, setCurrentHand] = useState('');
+  const [handAnalysisResult, setHandAnalysisResult] = useState('');
+  const [handAnalysisHistory, setHandAnalysisHistory] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const analyzeHand = async () => {
-    setIsLoading(true);
-    const result = await axios.get(`https://api.pokerhands.com/analyze?hand=${hand}`);
-    setAnalysis(result.data);
-    setAnalysisHistory(oldHistory => [...oldHistory, result.data]);
-    setIsLoading(false);
+  const analyzePokerHand = async () => {
+    setIsAnalyzing(true);
+    const apiUrl = `https://api.pokerhands.com/analyze?hand=${currentHand}`;
+    try {
+      const response = await axios.get(apiUrl);
+      setHandAnalysisResult(response.data);
+      setHandAnalysisHistory(prevHistory => [...prevHistory, response.data]);
+    } catch(error) {
+      console.error('Failed to analyze hand:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
     <div className="PokerAssistant">
       <input
-        value={hand}
-        onChange={(e) => setHand(e.target.value)}
+        value={currentHand}
+        onChange={(e) => setCurrentHand(e.target.value)}
         placeholder="Enter hand"
       />
-      <button onClick={analyzeHand} disabled={isLoading}>
+      <button onClick={analyzePokerHand} disabled={isAnalyzing}>
         Analyze Hand
       </button>
-      {isLoading ? (
+      {isAnalyzing ? (
         <div>Loading...</div>
       ) : (
-        <div>{analysis}</div>
+        <div>{handAnalysisResult}</div>
       )}
       <div>
         <h2>Analysis History</h2>
-        {analysisHistory.map((analysis, index) => (
-          <div key={index}>{analysis}</div>
+        {handAnalysisHistory.map((result, index) => (
+          <div key={index}>{result}</div>
         ))}
       </div>
     </div>
