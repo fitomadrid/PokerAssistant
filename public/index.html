@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokerAssistant Interface</title>
+    <style>
+        /* Basic styling for better visualization */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section input, .action-buttons button {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .action-buttons button {
+            cursor:pointer;
+        }
+
+        .output-section div {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PokerAssistant Interface</h1>
+        <div class="input-section">
+            <label for="poker-hand">Enter your Poker Hand:</label>
+            <input type="text" id="poker-hand" placeholder="e.g., 5H 5C 6S 7S KD">
+        </div>
+        <div class="action-buttons">
+            <button onclick="analyzeHand()">Analyze Hand</button>
+        </div>
+        <div class="output-section">
+            <div id="analysis-output">Analysis will be displayed here...</div>
+        </div>
+    </div>
+
+    <script>
+        function analyzeHand() {
+            var handInput = document.getElementById('poker-hand').value;
+            var analysisResult = 'Analyzing hand: ' + handInput;
+            document.getElementById('analysis-output').innerText = analysisResult;
+        }
+    </script>
+</body>
+</html>
