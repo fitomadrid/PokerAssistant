@@ -1,9 +1,11 @@
+/* Reset styles for consistent rendering across browsers */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base body styles */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f2f2f2;
@@ -11,43 +13,49 @@ body {
     padding: 20px;
 }
 
+/* Main container styling */
 .main-container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto; /* Center align container */
     padding: 20px;
     background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
 }
 
+/* Input area styling */
 .input-section {
     margin-bottom: 20px;
 }
 
 .input-section h2 {
     margin-bottom: 10px;
-    color: #444;
+    color: #444; /* Slightly darker font color for headings */
 }
 
+/* Styling for input fields */
 .input-field {
-    width: 100%;
+    width: 100%; /* Full width to occupy parent container space */
     padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin-bottom: 10px; /* Space between input fields */
+    border: 1px solid #ddd; /* Light border for inputs */
+    border-radius: 5px; /* Rounded corners for the input fields */
 }
 
+/* Display area for analysis results */
 .analysis-display {
-    background-color: #f9f9f9;
+    background-color: #f9f9f9; /* Light background for the analysis area */
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    border-radius: 5px; /* Consistent rounded corners with input fields */
+    margin-bottom: 20px; /* Space before the next section/element */
 }
 
+/* Styling for analysis results */
 .analysis-result {
     font-weight: bold;
-    color: #007BFF;
+    color: #007BFF; /* Blue color for highlighting analysis result */
 }
 
+/* Responsive design adjustments for tablets */
 @media (max-width: 768px) {
     .main-container {
         padding: 10px;
@@ -58,12 +66,13 @@ body {
     }
 }
 
+/* Responsive design adjustments for smaller devices */
 @media (max-width: 480px) {
     .input-field {
-        padding: 8px;
+        padding: 8px; /* Slightly reduced padding for small screens */
     }
 
     .input-section h2 {
-        font-size: 18px;
+        font-size: 18px; /* Adjusted font size for readability on small devices */
     }
 }
